@@ -86,7 +86,7 @@ switch($slack_type) {
     _slack_tell( $slack_message, $slack_channel, $slack_agent, $slack_icon, $slack_color);
     $slack_message = array();
     $slack_message['Build ID'] = $argv[2];
-    $slack_message['Build URL'] = 'https://circleci.com/gh/populist/drupal-auto-update/' . $argv[2];
+    $slack_message['Build URL'] = 'https://circleci.com/gh/electriccitizen/ec-auto-update/' . $argv[2];
     _slack_tell( $slack_message, $slack_channel, $slack_agent, $slack_icon, $slack_color);
     break;
   case 'terminus_login':
