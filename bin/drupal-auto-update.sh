@@ -12,7 +12,7 @@ php -f bin/slack_notify.php pantheon_multidev_setup
 echo -e "\nDeleting the ${TERMINUS_ENV} multidev environment..."
 terminus multidev:delete $SITE_UUID.$TERMINUS_ENV --delete-branch --yes
 echo -e "\nRe-creating the ${TERMINUS_ENV} multidev environment..."
-terminus multidev:create $SITE_UUID.live $TERMINUS_ENV
+terminus multidev:create $SITE_UUID.dev $TERMINUS_ENV
 
 # check for upstream updates
 echo -e "\nChecking for upstream updates on the ${TERMINUS_ENV} multidev..."
@@ -32,8 +32,10 @@ else
     # apply Drupal upstream updates
     echo -e "\nApplying upstream updates on the ${TERMINUS_ENV} multidev..."
     php -f bin/slack_notify.php drupal_coreupdates 
-    php -f bin/slack_notify.php terminus_coreupdates 
-    terminus upstream:updates:apply $SITE_UUID.$TERMINUS_ENV --yes --updatedb --accept-upstream
+    php -f bin/slack_notify.php terminus_coreupdates
+    #terminus upstream:updates:apply $SITE_UUID.$TERMINUS_ENV --yes --updatedb --accept-upstream
+    terminus composer $SITE_UUID.$TERMINUS_ENV -- update drupal/core --with-dependencies
+    terminus drush updb
     UPDATES_APPLIED=true
 fi
 
@@ -55,7 +57,9 @@ else
     echo -e "\nUpdating Drupal modules on the ${TERMINUS_ENV} multidev..."
     php -f bin/slack_notify.php drupal_moduleupdates ${PLUGIN_UPDATES}
     php -f bin/slack_notify.php terminus_moduleupdates
-    terminus drush $SITE_UUID.$TERMINUS_ENV -- pm-updatecode --no-core --yes
+    #terminus drush $SITE_UUID.$TERMINUS_ENV -- pm-updatecode --no-core --yes
+    terminus composer $SITE_UUID.$TERMINUS_ENV -- update --with-dependencies
+    terminus drush updb
 
     # wake the site environment before committing code
     echo -e "\nWaking the ${TERMINUS_ENV} multidev..."
